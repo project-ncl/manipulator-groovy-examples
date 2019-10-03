@@ -69,8 +69,6 @@ public class GradleScriptTest extends AbstractWiremockTest {
                         replaceAll(":analyzer:.*", ":analyzer:" + System.getProperty("GME_VERSION") + "\""),
                 Charset.defaultCharset());
 
-
-
         URL resource = Thread.currentThread().getContextClassLoader().getResource("simple-project-with-custom-groovy-script-da-response.json");
 
         if ( resource == null )
@@ -91,12 +89,13 @@ public class GradleScriptTest extends AbstractWiremockTest {
         final File projectRoot = tempDir.newFolder("simple-project-with-custom-groovy-script");
         FileUtils.copyDirectory(Paths
                 .get(GradleScriptTest.class.getClassLoader().getResource(projectRoot.getName()).toURI()).toFile(), projectRoot);
+        final File groovy = GroovyLoader.loadGroovy("gme.groovy");
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--info");
         args.add("--init-script=" + initScript);
         args.add("-D" + Configuration.DA + "=http://127.0.0.1:" + AbstractWiremockTest.PORT + "/da/rest/v-1");
-        args.add("-DgroovyScripts=file://" + projectRoot + "/gme.groovy");
+        args.add("-DgroovyScripts=file://" + groovy);
         args.add("generateAlignmentMetadata");
 
         try ( ProjectConnection connection = connector.forProjectDirectory(projectRoot).connect() )
