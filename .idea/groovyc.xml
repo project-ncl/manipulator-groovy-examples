@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GroovyCompilerProjectConfiguration">
+    <option name="configScript" value="$PROJECT_DIR$/src/conf/config.groovy" />
+  </component>
+</project>

@@ -37,7 +37,7 @@ public class MavenScriptTest
     public TemporaryFolder temp = new TemporaryFolder();
 
     @Rule
-    public final SystemOutRule systemRule = new SystemOutRule().enableLog();//.muteForSuccessfulTests();
+    public final SystemOutRule systemRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Test
     public void testGroovyAnnotation() throws Exception {

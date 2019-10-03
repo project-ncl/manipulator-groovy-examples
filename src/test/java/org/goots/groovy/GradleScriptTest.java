@@ -45,7 +45,7 @@ public class GradleScriptTest extends AbstractWiremockTest {
     public WireMockRule wireMockRule = new WireMockRule(8089);
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();//.muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
