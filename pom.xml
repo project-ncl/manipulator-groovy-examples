@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.redhat.rcm</groupId>
     <artifactId>redhat-releng-tools</artifactId>
-    <version>6</version>
+    <version>7</version>
   </parent>
 
   <groupId>org.goots.groovy</groupId>
@@ -199,6 +199,16 @@
       <artifactId>gradle-tooling-api</artifactId>
       <version>${gradleVersion}</version>
     </dependency>
+    <dependency>
+      <groupId>org.gradle</groupId>
+      <artifactId>gradle-base-services</artifactId>
+      <version>${gradleVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.gradle</groupId>
+      <artifactId>gradle-process-services</artifactId>
+      <version>${gradleVersion}</version>
+    </dependency>
 
     <!-- MUST be at end due to being an uber-jar -->
     <dependency>
@@ -246,6 +256,7 @@
           </execution>
         </executions>
         <configuration>
+          <configScript>src/conf/config.groovy</configScript>
           <debug>true</debug>
         </configuration>
       </plugin>
