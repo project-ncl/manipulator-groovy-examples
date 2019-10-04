@@ -1,9 +1,11 @@
 package org.goots.groovy;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef;
@@ -21,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
+import junit.framework.TestCase;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -62,6 +65,19 @@ public class MavenScriptTest
         assertEquals("3.5.0", result.get(0));
     }
 
+    @Test
+    public void resolverTest() throws Exception
+    {
+        final ManipulationSession session = TestUtils.createSession( null );
+        final ModelIO model = new ModelIO
+                (new GalleyAPIWrapper(
+                        new GalleyInfrastructure( session, null)
+                                .init( null, null, temp.newFolder("cache-dir" ) )));
+
+        File c = model.resolveRawFile( SimpleArtifactRef.parse( "academy.alex:custommatcher:1.0"  ) );
+        TestCase.assertTrue (c.exists());
+        TestCase.assertTrue (FileUtils.readFileToString( c, Charset.defaultCharset()).contains( "This is Custom Matcher to validate Credit Card" ));
+    }
 
     @Test
     public void testInlineProperty() throws Exception
@@ -114,7 +130,5 @@ public class MavenScriptTest
                          .orElseThrow(Exception::new)
                          .getVersion()
                          .contains( "$" ) );
-
-
     }
 }
