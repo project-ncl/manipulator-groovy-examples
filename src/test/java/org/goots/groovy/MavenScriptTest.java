@@ -1,6 +1,7 @@
 package org.goots.groovy;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef;
+import org.commonjava.maven.ext.common.ManipulationException;
 import org.commonjava.maven.ext.common.model.Project;
 import org.commonjava.maven.ext.core.ManipulationManager;
 import org.commonjava.maven.ext.core.ManipulationSession;
@@ -66,8 +68,7 @@ public class MavenScriptTest
     }
 
     @Test
-    public void resolverTest() throws Exception
-    {
+    public void resolverTest() throws IOException, ManipulationException {
         final ManipulationSession session = TestUtils.createSession( null );
         final ModelIO model = new ModelIO
                 (new GalleyAPIWrapper(
