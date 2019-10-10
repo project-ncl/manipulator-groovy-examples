@@ -27,3 +27,8 @@ Usage
 
 Currently this project comes with two sample groovy scripts ( with API completion enabled ) and two
 sample tests to demonstrate the application of those scripts.
+
+Contributions
+=============
+
+Contributions are very welcome. Each example Groovy script should be paired with a test and documentation to describe its usage.

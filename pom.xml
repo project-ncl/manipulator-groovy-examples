@@ -45,7 +45,7 @@
     <atlasVersion>0.17.1</atlasVersion>
 
     <pmeVersion>3.9-SNAPSHOT</pmeVersion>
-    <gmeVersion>1.3-SNAPSHOT</gmeVersion>
+    <gmeVersion>1.3</gmeVersion>
   </properties>
 
   <developers>
