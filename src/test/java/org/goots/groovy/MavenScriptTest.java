@@ -47,7 +47,7 @@ public class MavenScriptTest
                 .getParentFile(), "pom.xml");
         PomIO pomIO = new PomIO();
         List<Project> projects = pomIO.parseProject(pRoot);
-        ManipulationManager m = new ManipulationManager(Collections.emptyMap(), Collections.emptyMap(), null);
+        ManipulationManager m = new ManipulationManager(null, Collections.emptyMap(), Collections.emptyMap(), null);
         ManipulationSession ms = TestUtils.createSession(null);
         m.init(ms);
 
@@ -93,7 +93,7 @@ public class MavenScriptTest
 
         PomIO pomIO = new PomIO();
         List<Project> projects = pomIO.parseProject( pme );
-        ManipulationManager m = new ManipulationManager( Collections.emptyMap(), Collections.emptyMap(), null );
+        ManipulationManager m = new ManipulationManager( null, Collections.emptyMap(), Collections.emptyMap(), null );
         ManipulationSession ms = TestUtils.createSession( null );
         m.init( ms );
 

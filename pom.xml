@@ -44,7 +44,7 @@
     <groovyVersion>2.5.7</groovyVersion>
     <atlasVersion>0.17.1</atlasVersion>
 
-    <pmeVersion>3.9-SNAPSHOT</pmeVersion>
+    <pmeVersion>3.8.1</pmeVersion>
     <gmeVersion>1.3</gmeVersion>
   </properties>
 
@@ -75,7 +75,8 @@
     <dependency>
       <groupId>org.commonjava.maven.ext</groupId>
       <artifactId>pom-manipulation-core</artifactId>
-      <version>${pmeVersion}</version>
+      <!-- Hack to avoid relying on PME 3.9 throughout -->
+      <version>3.9-SNAPSHOT</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
