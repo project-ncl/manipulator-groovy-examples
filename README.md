@@ -21,12 +21,17 @@ IntelliJ it is advised that the following plugin is installed first:
 
 * https://plugins.jetbrains.com/plugin/7442-gmavenplus-intellij-plugin
 
+It is also recommended to install:
+
+* https://plugins.jetbrains.com/plugin/6317-lombok/
 
 Usage
 =====
 
 Currently this project comes with two sample groovy scripts ( with API completion enabled ) and two
 sample tests to demonstrate the application of those scripts.
+
+The project should be imported into IntelliJ as a new project and it should use the Maven model it setup the structure.
 
 Contributions
 =============
