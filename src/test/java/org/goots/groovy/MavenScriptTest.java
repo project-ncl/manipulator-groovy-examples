@@ -41,7 +41,7 @@ public class MavenScriptTest
 
     @Test
     public void testGroovyAnnotation() throws Exception {
-        final File groovy = GroovyLoader.loadGroovy("pme.groovy");
+        final File groovy = GroovyLoader.loadGroovy("pmeBasicDemo.groovy");
         final File pRoot = new File(TestUtils.resolveFileResource("", "")
                 .getParentFile()
                 .getParentFile(), "pom.xml");

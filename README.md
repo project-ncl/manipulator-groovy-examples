@@ -2,6 +2,17 @@
 [![Build Status (Travis CI)](https://travis-ci.org/project-ncl/manipulator-groovy-examples.svg?branch=master)](https://travis-ci.org/project-ncl/manipulator-groovy-examples.svg?branch=master)
 
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+    - [IntelliJ](#intellij)
+- [Usage](#usage)
+- [Contributions](#contributions)
+
+<!-- markdown-toc end -->
+
 
 Introduction
 ============
@@ -29,9 +40,11 @@ Usage
 =====
 
 Currently this project comes with two sample groovy scripts ( with API completion enabled ) and two
-sample tests to demonstrate the application of those scripts.
+sample tests to demonstrate the application of those scripts. The project should be imported into IntelliJ 
+as a new project and it should use the Maven model it setup the structure.
 
-The project should be imported into IntelliJ as a new project and it should use the Maven model it setup the structure.
+
+For a breakdown of existing scripts please see [this](https://github.com/project-ncl/manipulator-groovy-examples/blob/master/SCRIPT_INDEX.md)
 
 Contributions
 =============

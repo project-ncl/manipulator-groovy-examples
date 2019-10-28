@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
+import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
@@ -36,6 +37,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.gradle.tooling.GradleConnector.newConnector;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -47,6 +49,9 @@ public class GradleScriptTest extends AbstractWiremockTest {
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
+    @Rule
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
 
@@ -81,7 +86,8 @@ public class GradleScriptTest extends AbstractWiremockTest {
                         .withHeader("Content-Type", "application/json;charset=utf-8")
                         .withBody(FileUtils.readFileToString ( new File ( resource.getPath()) , Charset.defaultCharset() ))));
 
-        connector = org.gradle.tooling.GradleConnector.newConnector().useGradleVersion("5.6.2");
+
+        connector = newConnector().useGradleVersion("5.6.2");
     }
 
     @Test
@@ -89,21 +95,22 @@ public class GradleScriptTest extends AbstractWiremockTest {
         final File projectRoot = tempDir.newFolder("simple-project-with-custom-groovy-script");
         FileUtils.copyDirectory(Paths
                 .get(GradleScriptTest.class.getClassLoader().getResource(projectRoot.getName()).toURI()).toFile(), projectRoot);
-        final File groovy = GroovyLoader.loadGroovy("gme.groovy");
+        final File groovy = GroovyLoader.loadGroovy("gmeBasicDemo.groovy");
 
         ArrayList<String> args = new ArrayList<>();
         args.add("--info");
         args.add("--init-script=" + initScript);
         args.add("-D" + Configuration.DA + "=http://127.0.0.1:" + AbstractWiremockTest.PORT + "/da/rest/v-1");
         args.add("-DgroovyScripts=file://" + groovy);
-        args.add("generateAlignmentMetadata");
 
-        try ( ProjectConnection connection = connector.forProjectDirectory(projectRoot).connect() )
+        try ( ProjectConnection connection = connector.forProjectDirectory(projectRoot).connect())
         {
-            BuildLauncher buildLauncher = connection.newBuild().withArguments(args);
+            BuildLauncher buildLauncher = connection.newBuild();
             buildLauncher.setStandardError(System.err);
             buildLauncher.setColorOutput(true);
             buildLauncher.setStandardOutput(System.out);
+            buildLauncher.addArguments(args);
+            buildLauncher.forTasks("generateAlignmentMetadata");
             buildLauncher.run();
         }
 
