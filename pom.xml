@@ -45,7 +45,7 @@
     <atlasVersion>0.17.1</atlasVersion>
 
     <pmeVersion>3.8.1</pmeVersion>
-    <gmeVersion>1.3</gmeVersion>
+    <gmeVersion>1.5</gmeVersion>
   </properties>
 
   <developers>
@@ -213,14 +213,19 @@
 
     <!-- MUST be at end due to being an uber-jar -->
     <dependency>
-      <groupId>org.jboss.gm.analyzer</groupId>
+      <groupId>org.jboss.gm</groupId>
       <artifactId>analyzer</artifactId>
       <version>${gmeVersion}</version>
       <classifier>tests</classifier>
     </dependency>
     <dependency>
-      <groupId>org.jboss.gm.analyzer</groupId>
+      <groupId>org.jboss.gm</groupId>
       <artifactId>analyzer</artifactId>
+      <version>${gmeVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.gm</groupId>
+      <artifactId>cli</artifactId>
       <version>${gmeVersion}</version>
     </dependency>
   </dependencies>

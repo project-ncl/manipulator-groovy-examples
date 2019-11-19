@@ -5,17 +5,19 @@ package org.goots.groovy
  *
  */
 
-import groovy.transform.BaseScript
 import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef
-import org.jboss.gm.analyzer.alignment.groovy.GMEBaseScript
+import org.commonjava.maven.ext.core.groovy.GMEBaseScript
+import org.jboss.gm.common.groovy.BaseScript
+import org.commonjava.maven.ext.core.groovy.InvocationPoint
+import org.commonjava.maven.ext.core.groovy.InvocationStage
 
-
+@InvocationPoint(invocationPoint = InvocationStage.LAST)
 // Use BaseScript annotation to set script for evaluating the DSL.
-@BaseScript GMEBaseScript gmeScript
+@GMEBaseScript BaseScript gmeScript
 
 class mygme {
 
-    def run(GMEBaseScript gmeScript) {
+    def run(BaseScript gmeScript) {
         println "Running Groovy script on " + gmeScript.getProject()
         println("\tgroovy found new version is " + gmeScript.getModel().getVersion())
 
