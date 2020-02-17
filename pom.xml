@@ -45,7 +45,7 @@
     <atlasVersion>0.17.1</atlasVersion>
 
     <pmeVersion>3.8.1</pmeVersion>
-    <gmeVersion>1.5</gmeVersion>
+    <gmeVersion>1.6</gmeVersion>
   </properties>
 
   <developers>
@@ -250,7 +250,7 @@
       <plugin>
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
-        <version>1.8.0</version>
+        <version>1.8.1</version>
         <executions>
           <execution>
             <goals>

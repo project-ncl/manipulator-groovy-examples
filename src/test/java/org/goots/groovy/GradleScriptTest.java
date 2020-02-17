@@ -83,7 +83,7 @@ public class GradleScriptTest extends AbstractWiremockTest {
         }
         else
         {
-            FileUtils.copyURLToFile( new URL( "http://central.maven.org/maven2/org/jboss/gm/analyzer" + File.separator
+            FileUtils.copyURLToFile( new URL( "https://repo1.maven.org/maven2/org/jboss/gm/analyzer" + File.separator
                                                               + gmeVersion + File.separator + "analyzer-" + gmeVersion
                                                               + "-init.gradle" ), initScript );
         }
