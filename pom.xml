@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.redhat.rcm</groupId>
     <artifactId>redhat-releng-tools</artifactId>
-    <version>7</version>
+    <version>8</version>
   </parent>
 
   <groupId>org.goots.groovy</groupId>
@@ -44,8 +44,8 @@
     <groovyVersion>2.5.7</groovyVersion>
     <atlasVersion>0.17.1</atlasVersion>
 
-    <pmeVersion>3.8.1</pmeVersion>
-    <gmeVersion>1.6</gmeVersion>
+    <pmeVersion>3.8.2</pmeVersion>
+    <gmeVersion>1.6.2</gmeVersion>
   </properties>
 
   <developers>
@@ -242,9 +242,6 @@
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <header>APACHE-2-SIMPLIFIED-COPYRIGHT.txt</header>
-        </configuration>
       </plugin>
 
       <plugin>
