@@ -1,11 +1,6 @@
 package org.goots.groovy;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
@@ -25,7 +20,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
-import junit.framework.TestCase;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,13 +48,13 @@ public class MavenScriptTest
                 .getParentFile(), "pom.xml");
         PomIO pomIO = new PomIO();
         List<Project> projects = pomIO.parseProject(pRoot);
-        ManipulationManager m = new ManipulationManager(null, Collections.emptyMap(), Collections.emptyMap(), null);
+        ManipulationManager m = new ManipulationManager(Collections.emptyMap(), Collections.emptyMap(), null);
         ManipulationSession ms = TestUtils.createSession(null);
         m.init(ms);
 
         Project root = projects.stream().filter(p -> p.getProjectParent()==null).findAny().orElse(null);
 
-        InitialGroovyManipulator gm = new InitialGroovyManipulator(null, null);
+        InitialGroovyManipulator gm = new InitialGroovyManipulator(null, null, null);
         gm.init(ms);
         TestUtils.executeMethod(gm, "applyGroovyScript", new Class[]{List.class, Project.class, File.class},
                 new Object[]{projects, root, groovy});
@@ -93,7 +94,7 @@ public class MavenScriptTest
 
         PomIO pomIO = new PomIO();
         List<Project> projects = pomIO.parseProject( pme );
-        ManipulationManager m = new ManipulationManager( null, Collections.emptyMap(), Collections.emptyMap(), null );
+        ManipulationManager m = new ManipulationManager( Collections.emptyMap(), Collections.emptyMap(), null );
         ManipulationSession ms = TestUtils.createSession( null );
         m.init( ms );
 
@@ -107,7 +108,7 @@ public class MavenScriptTest
                 return null;
             }
         };
-        bs.setValues( null, ms, projects, root, null );
+        bs.setValues( null, null, null, ms, projects, root, null );
 
         bs.inlineProperty( root, SimpleProjectRef.parse( "org.commonjava.maven.atlas:atlas-identities" ) );
 
@@ -119,6 +120,17 @@ public class MavenScriptTest
                                     .findFirst()
                                     .orElseThrow(Exception::new)
                                     .getVersion() );
+
+        bs.inlineProperty( root, SimpleProjectRef.parse( "org.apache.maven:*" ) );
+
+        // Demonstrate wildcard inlining of properties
+        assertEquals( 0, root.getModel()
+                                    .getDependencyManagement()
+                                    .getDependencies()
+                                    .stream()
+                                    .filter( d -> d.getGroupId().equals( "org.apache.maven" ) )
+                                    .filter( d -> d.getVersion().contains( "$" ) )
+                                    .count() );
 
         bs.inlineProperty( root, "pmeVersion" );
 

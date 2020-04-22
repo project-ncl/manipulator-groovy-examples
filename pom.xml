@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.redhat.rcm</groupId>
     <artifactId>redhat-releng-tools</artifactId>
-    <version>8</version>
+    <version>9</version>
   </parent>
 
   <groupId>org.goots.groovy</groupId>
@@ -44,8 +44,8 @@
     <groovyVersion>2.5.7</groovyVersion>
     <atlasVersion>0.17.1</atlasVersion>
 
-    <pmeVersion>3.8.2</pmeVersion>
-    <gmeVersion>1.6.2</gmeVersion>
+    <pmeVersion>3.9-SNAPSHOT</pmeVersion>
+    <gmeVersion>1.8-SNAPSHOT</gmeVersion>
   </properties>
 
   <developers>
