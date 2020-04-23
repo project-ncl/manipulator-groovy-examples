@@ -226,6 +226,13 @@
       <groupId>org.jboss.gm</groupId>
       <artifactId>analyzer</artifactId>
       <version>${gmeVersion}</version>
+      <classifier>init</classifier>
+      <type>gradle</type>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.gm</groupId>
+      <artifactId>analyzer</artifactId>
+      <version>${gmeVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.gm</groupId>
