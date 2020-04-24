@@ -44,7 +44,7 @@
     <groovyVersion>2.5.7</groovyVersion>
     <atlasVersion>0.17.1</atlasVersion>
 
-    <pmeVersion>3.9-SNAPSHOT</pmeVersion>
+    <pmeVersion>4.0</pmeVersion>
     <gmeVersion>1.8-SNAPSHOT</gmeVersion>
   </properties>
 
