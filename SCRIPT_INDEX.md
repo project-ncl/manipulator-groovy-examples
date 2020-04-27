@@ -15,3 +15,11 @@ test verifies this and further inlining behaviour.
 This script demonstrates modifying the current model (which results in changes to the json)
 and modifying both the `build.gradle` file and the `settings.gradle` file. The corresponding
 tests verify this.
+
+## gmeGroovyFirst
+
+This demonstrates running a Groovy script before invoking Gradle. It will modify the `build.gradle` file on disk.
+
+## quarkusPlatformPre
+
+This script demonstrates adding modules to a project, using the extended API and resolving POMs from external locations.
