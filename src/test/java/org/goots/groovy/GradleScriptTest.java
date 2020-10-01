@@ -1,12 +1,10 @@
 package org.goots.groovy;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.ext.common.ManipulationException;
 import org.gradle.api.Project;
-import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
-import org.gradle.tooling.ProjectConnection;
 import org.jboss.gm.analyzer.alignment.AbstractWiremockTest;
 import org.jboss.gm.analyzer.alignment.AlignmentTask;
 import org.jboss.gm.analyzer.alignment.TestUtils;
@@ -17,8 +15,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
-import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.contrib.java.lang.system.internal.LogPrintStream;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 
@@ -48,11 +46,24 @@ import static org.junit.Assert.assertFalse;
 public class GradleScriptTest extends AbstractWiremockTest {
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
-    @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
-
+    static
+    {
+        // TODO: Remove once GME 2.3 is out.
+        try
+        {
+            LogPrintStream logPrintStream =
+                            (LogPrintStream) FieldUtils.readDeclaredField( systemErrRule, "logPrintStream", true);
+            Object m = FieldUtils.readDeclaredField( logPrintStream, "muteableLogStream", true );
+            FieldUtils.writeDeclaredField( m, "originalStreamMuted", false, true );
+            FieldUtils.writeDeclaredField( m, "failureLogMuted", true, true );
+        }
+        catch ( IllegalAccessException e )
+        {
+            e.printStackTrace();
+        }
+    }
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
 
@@ -97,24 +108,19 @@ public class GradleScriptTest extends AbstractWiremockTest {
     }
 
 
-    private void runAlignment(File projectRoot, ArrayList<String> args)
+    private void runAlignment(File projectRoot, ArrayList<String> args) throws Exception
     {
         args.add( "-D=gmeFunctionalTest=true" );
-        try ( ProjectConnection connection = connector.forProjectDirectory(projectRoot).connect())
-        {
-            BuildLauncher buildLauncher = connection.newBuild();
-            buildLauncher.setStandardError(System.err);
-            buildLauncher.setColorOutput(true);
-            buildLauncher.setStandardOutput(System.out);
-            //noinspection UnstableApiUsage
-            buildLauncher.addArguments(args);
-            buildLauncher.forTasks("generateAlignmentMetadata");
-            buildLauncher.run();
-        }
+        args.add( "--info" );
+        // TODO: To enable Gradle debugging
+        // args.add( "-Dorg.gradle.debug=true" );
+        args.add("generateAlignmentMetadata" );
+
+        new Main().run( args.toArray(new String[]{}) );
     }
 
     @Test
-    public void verifyBasicGroovyInjection() throws IOException, URISyntaxException, ManipulationException
+    public void verifyBasicGroovyInjection() throws Exception
     {
         final File projectRoot = tempDir.newFolder("simple-project-with-custom-groovy-script");
         FileUtils.copyDirectory(Paths
@@ -122,10 +128,10 @@ public class GradleScriptTest extends AbstractWiremockTest {
         final File groovy = GroovyLoader.loadGroovy("gmeBasicDemo.groovy");
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--info");
         args.add("--init-script=" + initScript);
         args.add("-D" + Configuration.DA + "=" + wireMockRule.baseUrl() + "/da/rest/v-1");
         args.add("-DgroovyScripts=file://" + groovy);
+        args.add( "--target=" + projectRoot.getAbsolutePath() );
 
         System.out.println ("Starting with arguments " + args);
 
@@ -172,17 +178,17 @@ public class GradleScriptTest extends AbstractWiremockTest {
     }
 
     @Test
-    public void verifyGroovyFirstInjectionIgnored() throws IOException, URISyntaxException
+    public void verifyGroovyFirstInjectionIgnored() throws Exception
     {
         final File projectRoot = tempDir.newFolder("simple-project-with-custom-groovy-script");
         FileUtils.copyDirectory(Paths.get(GradleScriptTest.class.getClassLoader().getResource(projectRoot.getName()).toURI()).toFile(), projectRoot);
         final File groovy = GroovyLoader.loadGroovy("gmeGroovyFirst.groovy");
 
         ArrayList<String> args = new ArrayList<>();
-        args.add("--debug");
         args.add("--init-script=" + initScript);
         args.add("-D" + Configuration.DA + "=" + wireMockRule.baseUrl() + "/da/rest/v-1");
         args.add("-DgroovyScripts=file://" + groovy);
+        args.add( "--target=" + projectRoot.getAbsolutePath() );
 
         System.out.println ("Starting with arguments " + args);
 
@@ -204,12 +210,11 @@ public class GradleScriptTest extends AbstractWiremockTest {
 
         Main m = new Main();
         ArrayList<String> args = new ArrayList<>();
-        args.add("--info");
         args.add("--target=" + projectRoot.getAbsolutePath());
         args.add("--init-script=" + initScript);
         args.add("-D" + Configuration.DA + "=" + wireMockRule.baseUrl() + "/da/rest/v-1");
         args.add("-DgroovyScripts=file://" + groovyFirst + ",file://" + groovyLast);
-        args.add("generateAlignmentMetadata" );
+        args.add( "--target=" + projectRoot.getAbsolutePath() );
 
 
         System.out.println ("Starting with arguments " + args);

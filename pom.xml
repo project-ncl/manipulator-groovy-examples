@@ -41,11 +41,11 @@
 
     <gradleVersion>5.6</gradleVersion>
     <mavenVersion>3.5.0</mavenVersion>
-    <groovyVersion>2.5.7</groovyVersion>
+    <groovyVersion>3.0.5</groovyVersion>
     <atlasVersion>0.17.1</atlasVersion>
 
     <pmeVersion>4.0</pmeVersion>
-    <gmeVersion>1.8-SNAPSHOT</gmeVersion>
+    <gmeVersion>2.2</gmeVersion>
   </properties>
 
   <developers>
@@ -154,7 +154,7 @@
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
-      <version>1.18.0</version>
+      <version>1.19.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
