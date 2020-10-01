@@ -8,11 +8,7 @@ public class GMEManipulationModel
 {
     public GMEManipulationModel( ManipulationModel m )
     {
-        group = m.getGroup();
-        name = m.getName();
-        version = m.getVersion();
-        alignedDependencies = m.getAlignedDependencies();
-        children = m.getChildren();
+        super(m);
         logger = new GradleLogger();
     }
 }
