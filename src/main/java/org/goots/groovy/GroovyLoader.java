@@ -17,6 +17,6 @@ class GroovyLoader {
     static File loadGroovy (String name)
     {
         String path = GroovyLoader.class.getResource(GL).getPath();
-        return new File (path.replaceAll("(.*)(target/test-classes)(.*)(GroovyLoader.class)", "$1src/main/groovy$3" + name));
+        return new File (path.replaceAll("(.*)(target/classes)(.*)(GroovyLoader.class)", "$1src/main/groovy$3" + name));
     }
 }

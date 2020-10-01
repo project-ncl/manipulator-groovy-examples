@@ -45,7 +45,7 @@
     <atlasVersion>0.17.1</atlasVersion>
 
     <pmeVersion>4.0</pmeVersion>
-    <gmeVersion>2.2</gmeVersion>
+    <gmeVersion>2.3-SNAPSHOT</gmeVersion>
   </properties>
 
   <developers>
@@ -189,6 +189,13 @@
     </dependency>
 
     <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.gradle</groupId>
       <artifactId>gradle-core-api</artifactId>
       <version>${gradleVersion}</version>
@@ -234,6 +241,7 @@
       <artifactId>analyzer</artifactId>
       <version>${gmeVersion}</version>
     </dependency>
+
     <dependency>
       <groupId>org.jboss.gm</groupId>
       <artifactId>cli</artifactId>
