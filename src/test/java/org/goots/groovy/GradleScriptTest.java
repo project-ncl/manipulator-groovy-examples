@@ -101,14 +101,13 @@ public class GradleScriptTest
                                                                                                                  "simple-project-with-custom-groovy-script-da-response.json" ) ) ) );
     }
 
-    private void runAlignment( File projectRoot, ArrayList<String> args ) throws Exception
+    private void runAlignment( ArrayList<String> args ) throws Exception
     {
         args.add( "-D=gmeFunctionalTest=true" );
         args.add( "--info" );
         // TODO: To enable Gradle debugging
-        // args.add( "-Dorg.gradle.debug=true" );
+        args.add( "-Dorg.gradle.debug=true" );
         args.add( "generateAlignmentMetadata" );
-
         new Main().run( args.toArray( new String[] {} ) );
     }
 
@@ -128,7 +127,7 @@ public class GradleScriptTest
 
         System.out.println( "Starting with arguments " + args );
 
-        runAlignment( projectRoot, args );
+        runAlignment( args );
 
         GMEManipulationModel alignmentModel = new GMEManipulationModel( ManipulationIO.readManipulationModel( projectRoot ) );
 
@@ -183,7 +182,7 @@ public class GradleScriptTest
 
         System.out.println( "Starting with arguments " + args );
 
-        runAlignment( projectRoot, args );
+        runAlignment( args );
 
         assertTrue( systemOutRule.getLog().contains( "For target stage LAST attempting to invoke groovy script" ) );
         assertTrue( systemOutRule.getLog().contains( "InvocationPoint is FIRST" ) );
@@ -193,7 +192,6 @@ public class GradleScriptTest
     @Test
     public void verifyGroovyFirstAndLastInjection() throws Exception
     {
-
         final File projectRoot = tempDir.newFolder( "simple-project-with-custom-groovy-script-wrong-undertow" );
         FileUtils.copyDirectory( Paths.get( GradleScriptTest.class.getClassLoader().getResource( projectRoot.getName() ).toURI() ).toFile(),
                                  projectRoot );
@@ -209,7 +207,7 @@ public class GradleScriptTest
 
         System.out.println( "Starting with arguments " + args );
 
-        runAlignment( projectRoot, args );
+        runAlignment( args );
 
         assertTrue( systemOutRule.getLog().contains( "PASS : Caught Model is not supported for Groovy in initial stage." ) );
         assertTrue( systemOutRule.getLog().contains( "Running Groovy script on" ) );
@@ -245,5 +243,4 @@ public class GradleScriptTest
             assertTrue( s.contains( "another-pack" ) );
         } );
     }
-
 }
