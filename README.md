@@ -40,11 +40,13 @@ Usage
 =====
 
 Currently this project comes with two sample groovy scripts ( with API completion enabled ) and two
-sample tests to demonstrate the application of those scripts. The project should be imported into IntelliJ 
+sample tests to demonstrate the application of those scripts. The project should be imported into IntelliJ
 as a new project and it should use the Maven model it setup the structure.
 
 
 For a breakdown of existing scripts please see [this](https://github.com/project-ncl/manipulator-groovy-examples/blob/master/SCRIPT_INDEX.md)
+
+**Note:** it is currently not possible to debug a GME script with invocation point `LAST` when invoking the tool via the CLI. See [here](https://project-ncl.github.io/gradle-manipulator/guide/groovy.html#developing-groovy-scripts) for further information.
 
 Contributions
 =============
