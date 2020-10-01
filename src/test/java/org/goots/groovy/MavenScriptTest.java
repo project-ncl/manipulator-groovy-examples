@@ -12,7 +12,8 @@ import org.commonjava.maven.ext.core.ManipulationSession;
 import org.commonjava.maven.ext.core.fixture.TestUtils;
 import org.commonjava.maven.ext.core.fixture.TestUtils.SMContainer;
 import org.commonjava.maven.ext.core.groovy.BaseScript;
-import org.commonjava.maven.ext.core.impl.InitialGroovyManipulator;
+import org.commonjava.maven.ext.core.impl.FinalGroovyManipulator;
+import org.commonjava.maven.ext.core.impl.Manipulator;
 import org.commonjava.maven.ext.io.ModelIO;
 import org.commonjava.maven.ext.io.PomIO;
 import org.commonjava.maven.ext.io.resolver.GalleyAPIWrapper;
@@ -92,9 +93,10 @@ public class MavenScriptTest
         ManipulationSession ms = TestUtils.createSession(null);
         m.init(ms);
 
-        Project root = projects.stream().filter(p -> p.getProjectParent()==null).findAny().orElse(null);
+        // We could use the scanAndApply method in testQuarkusGroovyAnnotation but we don't want to alter the root pom.
 
-        InitialGroovyManipulator gm = new InitialGroovyManipulator(null, null, null);
+        Project root = projects.stream().filter(p -> p.getProjectParent()==null).findAny().orElse(null);
+        Manipulator gm = new FinalGroovyManipulator( null, null, null);
         gm.init(ms);
         TestUtils.executeMethod(gm, "applyGroovyScript", new Class[]{List.class, Project.class, File.class},
                 new Object[]{projects, root, groovy});
