@@ -43,10 +43,33 @@ public class MavenScriptTest
     public TemporaryFolder temp = new TemporaryFolder();
 
     @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
+    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
     @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+
+    @Test
+    public void testApplyingPMEScript() throws Exception
+    {
+        final File groovy = GroovyLoader.loadGroovy( "pmeBasicDemo.groovy" );
+        final File folder = temp.newFolder();
+        final File mvnRepo = temp.newFolder();
+        final File rootPom = new File( folder.getCanonicalFile(), "pom.xml" );
+
+        Git.cloneRepository().setURI( "https://github.com/michalszynkiewicz/empty.git" ).setDirectory( folder ).call();
+        System.out.println( "Cloned to " + folder );
+
+        Properties prop = new Properties();
+        prop.setProperty( "versionSuffix", "release-1" );
+        prop.setProperty( "groovyScripts", "file://" + groovy.getAbsolutePath() );
+        prop.setProperty( "maven.repo.local", mvnRepo.toString() );
+        SMContainer smc = TestUtils.createSessionAndManager( prop );
+        smc.getRequest().setPom( rootPom );
+        smc.getManager().scanAndApply( smc.getSession() );
+
+        assertTrue( systemOutRule.getLog().contains( "BASESCRIPT") );
+        assertTrue( systemOutRule.getLog().contains( "Project version : 1.0-SNAPSHOT ---> 1.0.0.release-1") );
+    }
 
     @Test
     public void testQuarkusGroovyAnnotation() throws Exception
