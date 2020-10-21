@@ -3,6 +3,7 @@ package org.goots.groovy
 import com.google.common.io.Files
 import groovy.transform.CompileDynamic
 import org.apache.maven.model.Dependency
+import org.commonjava.maven.ext.common.ManipulationException
 import org.commonjava.maven.ext.common.model.Project
 import org.commonjava.maven.ext.common.util.PropertyResolver
 import org.commonjava.maven.ext.core.groovy.BaseScript
@@ -12,6 +13,8 @@ import org.commonjava.maven.ext.core.groovy.PMEBaseScript
 
 @InvocationPoint(invocationPoint = InvocationStage.FIRST)
 @PMEBaseScript BaseScript pme
+
+if (!pme.getInvocationStage()) throw new ManipulationException("Run this script via PME")
 
 final productGroupId = 'com.redhat.quarkus'
 final qBomArtifactId = 'quarkus-bom'

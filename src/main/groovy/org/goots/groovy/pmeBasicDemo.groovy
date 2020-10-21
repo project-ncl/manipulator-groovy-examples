@@ -16,6 +16,7 @@
 package org.goots.groovy
 
 import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef
+import org.commonjava.maven.ext.common.ManipulationException
 import org.commonjava.maven.ext.core.groovy.BaseScript
 import org.commonjava.maven.ext.core.groovy.InvocationPoint
 import org.commonjava.maven.ext.core.groovy.InvocationStage
@@ -24,6 +25,7 @@ import org.commonjava.maven.ext.core.groovy.PMEBaseScript
 @InvocationPoint(invocationPoint = InvocationStage.LAST)
 @PMEBaseScript BaseScript pme
 
+if (!pme.getInvocationStage()) throw new ManipulationException("Run this script via PME")
 
 println "#### BASESCRIPT:"
 println pme.getBaseDir()

@@ -6,6 +6,7 @@ package org.goots.groovy
  */
 
 import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef
+import org.commonjava.maven.ext.common.ManipulationException
 import org.commonjava.maven.ext.core.groovy.GMEBaseScript
 import org.jboss.gm.common.groovy.BaseScript
 import org.commonjava.maven.ext.core.groovy.InvocationPoint
@@ -14,6 +15,8 @@ import org.commonjava.maven.ext.core.groovy.InvocationStage
 @InvocationPoint(invocationPoint = InvocationStage.LAST)
 // Use BaseScript annotation to set script for evaluating the DSL.
 @GMEBaseScript BaseScript gmeScript
+
+if (!gmeScript.getInvocationStage()) throw new ManipulationException("Run this script via GME")
 
 class mygme {
 

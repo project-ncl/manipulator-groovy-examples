@@ -1,5 +1,7 @@
 package org.goots.groovy
 
+import org.commonjava.maven.ext.common.ManipulationException
+
 /**
  * Example groovy file to manipulate a project.
  *
@@ -15,6 +17,7 @@ import org.jboss.gm.common.groovy.BaseScript
 // Use BaseScript annotation to set script for evaluating the DSL.
 @GMEBaseScript BaseScript gmeScript
 
+if (!gmeScript.getInvocationStage()) throw new ManipulationException("Run this script via GME")
 
 println "Running Groovy script on " + gmeScript.getBaseDir()
 
