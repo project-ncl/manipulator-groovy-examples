@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -82,16 +83,13 @@ public class GradleScriptTest
         if ( gmeVersion.contains( "SNAPSHOT" ) )
         {
             // Local development
-            Files.copy( Paths.get(
-                            System.getProperty( "user.home" ) + File.separator + ".m2/repository/org/jboss/gm/analyzer" + File.separator
-                                            + gmeVersion + File.separator + "analyzer-" + gmeVersion + "-init.gradle" ),
-                        initScript.toPath(), StandardCopyOption.REPLACE_EXISTING );
+            Path localInitScript = Paths.get( System.getProperty( "user.home" ), ".m2", "repository", "org", "jboss", "gm", "analyzer", gmeVersion, "analyzer-" + gmeVersion + "-init.gradle" );
+            Files.copy( localInitScript, initScript.toPath(), StandardCopyOption.REPLACE_EXISTING );
         }
         else
         {
-            FileUtils.copyURLToFile(
-                            new URL( "https://repo1.maven.org/maven2/org/jboss/gm/analyzer" + File.separator + gmeVersion + File.separator
-                                                     + "analyzer-" + gmeVersion + "-init.gradle" ), initScript );
+            URL localInitScriptUrl = new URL( "https://repo1.maven.org/maven2/org/jboss/gm/analyzer/" + gmeVersion + "/analyzer-" + gmeVersion + "-init.gradle" );
+            FileUtils.copyURLToFile( localInitScriptUrl, initScript );
         }
 
         stubFor( post( urlEqualTo( "/da/rest/v-1/reports/lookup/gavs" ) ).willReturn( aResponse().withStatus( 200 )
