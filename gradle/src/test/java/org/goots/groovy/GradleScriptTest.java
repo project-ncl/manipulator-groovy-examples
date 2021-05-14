@@ -1,5 +1,6 @@
 package org.goots.groovy;
 
+import com.google.common.io.Resources;
 import org.apache.commons.io.FileUtils;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.gradle.api.Project;
@@ -115,12 +116,12 @@ public class GradleScriptTest
         final File projectRoot = tempDir.newFolder( "simple-project-with-custom-groovy-script" );
         FileUtils.copyDirectory( Paths.get( GradleScriptTest.class.getClassLoader().getResource( projectRoot.getName() ).toURI() ).toFile(),
                                  projectRoot );
-        final File groovy = GroovyLoader.loadGroovy( "gmeBasicDemo.groovy" );
+        final URL groovy = Resources.getResource( "gmeBasicDemo.groovy" );
 
         ArrayList<String> args = new ArrayList<>();
         args.add( "--init-script=" + initScript );
         args.add( "-D" + Configuration.DA + "=" + wireMockRule.baseUrl() + "/da/rest/v-1" );
-        args.add( "-DgroovyScripts=file://" + groovy );
+        args.add( "-DgroovyScripts=" + groovy );
         args.add( "--target=" + projectRoot.getAbsolutePath() );
 
         System.out.println( "Starting with arguments " + args );
@@ -170,12 +171,12 @@ public class GradleScriptTest
         final File projectRoot = tempDir.newFolder( "simple-project-with-custom-groovy-script" );
         FileUtils.copyDirectory( Paths.get( GradleScriptTest.class.getClassLoader().getResource( projectRoot.getName() ).toURI() ).toFile(),
                                  projectRoot );
-        final File groovy = GroovyLoader.loadGroovy( "gmeGroovyFirst.groovy" );
+        final URL groovy = Resources.getResource( "gmeGroovyFirst.groovy" );
 
         ArrayList<String> args = new ArrayList<>();
         args.add( "--init-script=" + initScript );
         args.add( "-D" + Configuration.DA + "=" + wireMockRule.baseUrl() + "/da/rest/v-1" );
-        args.add( "-DgroovyScripts=file://" + groovy );
+        args.add( "-DgroovyScripts=" + groovy );
         args.add( "--target=" + projectRoot.getAbsolutePath() );
 
         System.out.println( "Starting with arguments " + args );
@@ -194,13 +195,13 @@ public class GradleScriptTest
         FileUtils.copyDirectory( Paths.get( GradleScriptTest.class.getClassLoader().getResource( projectRoot.getName() ).toURI() ).toFile(),
                                  projectRoot );
 
-        final File groovyFirst = GroovyLoader.loadGroovy( "gmeGroovyFirst.groovy" );
-        final File groovyLast = GroovyLoader.loadGroovy( "gmeBasicDemo.groovy" );
+        final URL groovyFirst = Resources.getResource( "gmeGroovyFirst.groovy" );
+        final URL groovyLast = Resources.getResource( "gmeBasicDemo.groovy" );
 
         ArrayList<String> args = new ArrayList<>();
         args.add( "--init-script=" + initScript );
         args.add( "-D" + Configuration.DA + "=" + wireMockRule.baseUrl() + "/da/rest/v-1" );
-        args.add( "-DgroovyScripts=file://" + groovyFirst + ",file://" + groovyLast );
+        args.add( "-DgroovyScripts=" + String.join( ",", groovyFirst.toString(), groovyLast.toString() ) );
         args.add( "--target=" + projectRoot.getAbsolutePath() );
 
         System.out.println( "Starting with arguments " + args );
