@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.goots.groovy</groupId>
+    <artifactId>manipulator-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>manipulator-examples-gradle</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Manipulator Groovy Examples Gradle</name>
+  <description>Example project for writing groovy scripts for GME</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.stefanbirkner</groupId>
+      <artifactId>system-rules</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Causes "Class path contains multiple SLF4J bindings" but we need it to compile the scripts -->
+    <dependency>
+      <groupId>org.gradle</groupId>
+      <artifactId>gradle-logging</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- MUST be at end due to being an uber-jar -->
+    <dependency>
+      <groupId>org.jboss.gm</groupId>
+      <artifactId>analyzer</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.gm</groupId>
+      <artifactId>analyzer</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.gm</groupId>
+      <artifactId>cli</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.gmavenplus</groupId>
+        <artifactId>gmavenplus-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>addSources</goal>
+              <goal>generateStubs</goal>
+              <goal>compile</goal>
+              <goal>removeStubs</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <configScript>src/conf/config.groovy</configScript>
+          <debug>true</debug>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

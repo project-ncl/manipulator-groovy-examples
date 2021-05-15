@@ -1,5 +1,6 @@
 package org.goots.groovy;
 
+import com.google.common.io.Resources;
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
@@ -27,7 +28,9 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class MavenScriptTest
@@ -51,7 +55,7 @@ public class MavenScriptTest
     @Test
     public void testApplyingPMEScript() throws Exception
     {
-        final File groovy = GroovyLoader.loadGroovy( "pmeBasicDemo.groovy" );
+        final URL groovy = Resources.getResource( "pmeBasicDemo.groovy" );
         final File folder = temp.newFolder();
         final File mvnRepo = temp.newFolder();
         final File rootPom = new File( folder.getCanonicalFile(), "pom.xml" );
@@ -61,20 +65,20 @@ public class MavenScriptTest
 
         Properties prop = new Properties();
         prop.setProperty( "versionSuffix", "release-1" );
-        prop.setProperty( "groovyScripts", "file://" + groovy.getAbsolutePath() );
+        prop.setProperty( "groovyScripts", groovy.toString() );
         prop.setProperty( "maven.repo.local", mvnRepo.toString() );
         SMContainer smc = TestUtils.createSessionAndManager( prop );
         smc.getRequest().setPom( rootPom );
         smc.getManager().scanAndApply( smc.getSession() );
 
-        assertTrue( systemOutRule.getLog().contains( "BASESCRIPT") );
-        assertTrue( systemOutRule.getLog().contains( "Project version : 1.0-SNAPSHOT ---> 1.0.0.release-1") );
+        assertTrue( systemOutRule.getLog().contains( "BASESCRIPT" ) );
+        assertTrue( systemOutRule.getLog().contains( "Project version : 1.0-SNAPSHOT --> 1.0.0.release-1" ) );
     }
 
     @Test
     public void testQuarkusGroovyAnnotation() throws Exception
     {
-        final File preGroovy = GroovyLoader.loadGroovy( "quarkusPlatformPre.groovy" );
+        final URL preGroovy = Resources.getResource( "quarkusPlatformPre.groovy" );
         final File quarkusFolder = temp.newFolder();
         final File mvnRepo = temp.newFolder();
         final File rootPom = new File( quarkusFolder.getCanonicalFile(), "pom.xml");
@@ -90,14 +94,14 @@ public class MavenScriptTest
         // inside Maven, Gradle dependencies etc) we get Google Inject CreationErrors. Therefore use the following block to
         // replicate the CLI
         Properties prop = new Properties();
-        prop.setProperty( "groovyScripts", "file://" + preGroovy.getAbsolutePath() );
+        prop.setProperty( "groovyScripts", preGroovy.toString() );
         prop.setProperty( "maven.repo.local", mvnRepo.toString() );
         SMContainer smc = TestUtils.createSessionAndManager( prop );
         smc.getRequest().setPom( rootPom );
         smc.getManager().scanAndApply( smc.getSession() );
 
         List<Project> result = new PomIO().parseProject( rootPom );
-        assertTrue( new File(quarkusFolder, "bom/product-bom").exists() );
+        assertTrue( new File( quarkusFolder, "bom" + File.separator + "product-bom" ).exists() );
         assertEquals( 5, result.get( 0 ).getModel().getModules().size() );
         assertEquals( result.stream().filter( p -> p.getArtifactId().equals( "quarkus-product-bom" ) )
                             .map( pr -> pr.getModel().getDependencyManagement().getDependencies().size() ).findFirst().orElse( 0 ),
@@ -106,7 +110,6 @@ public class MavenScriptTest
 
     @Test
     public void testGroovyAnnotation() throws Exception {
-        final File groovy = GroovyLoader.loadGroovy("pmeBasicDemo.groovy");
         final File pRoot = new File(TestUtils.resolveFileResource("", "")
                 .getParentFile()
                 .getParentFile(), "pom.xml");
@@ -121,8 +124,10 @@ public class MavenScriptTest
         Project root = projects.stream().filter(p -> p.getProjectParent()==null).findAny().orElse(null);
         Manipulator gm = new FinalGroovyManipulator( null, null, null);
         gm.init(ms);
+        final URL groovy = Resources.getResource("pmeBasicDemo.groovy");
+        final File groovyFile = Paths.get(groovy.toURI()).toFile();
         TestUtils.executeMethod(gm, "applyGroovyScript", new Class[]{List.class, Project.class, File.class},
-                new Object[]{projects, root, groovy});
+                new Object[]{projects, root, groovyFile});
         assertTrue( systemOutRule.getLog().contains( "BASESCRIPT") );
 
         List<String> result = projects.get(0).getModel().getDependencies().stream().
@@ -130,7 +135,7 @@ public class MavenScriptTest
                 map(Dependency::getVersion).collect(Collectors.toList());
 
         assertEquals(1, result.size());
-        assertEquals("3.5.0", result.get(0));
+        assertNull(result.get(0));
     }
 
     @Test
