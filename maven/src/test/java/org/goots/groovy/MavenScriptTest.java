@@ -214,4 +214,171 @@ public class MavenScriptTest
                          .getVersion()
                          .contains( "$" ) );
     }
+
+	@Test
+	public void testPMEScriptManipulations() throws Exception {
+		final URL groovy = Resources.getResource("manipulatePom.groovy");
+		final File registry = temp.newFolder();
+		final File mvnRepo = temp.newFolder();
+		final File rootPom = new File(registry.getCanonicalFile(), "pom.xml");
+
+		Git.cloneRepository()
+				.setURI("https://github.com/Apicurio/apicurio-registry.git")
+				.setDirectory(registry)
+				.setBranch("refs/tags/2.0.1.Final")
+				.call();
+		System.out.println("Cloned to " + registry);
+
+		// Before manipulations
+		List<Project> projects = new PomIO().parseProject(rootPom);
+
+		// 1. Check that the version property is not inlined for 'quarkus-test-common'
+		assertEquals("${quarkus.version}", projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("io.quarkus") && d.getArtifactId().equals("quarkus-test-common"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getVersion());
+		
+		
+		// 2. Fetch the value of property 'quarkus.version'
+		assertEquals("1.12.2.Final", projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst().orElseThrow(Exception::new)
+				.getModel()
+				.getProperties()
+				.getProperty("quarkus.version"));
+		
+		
+		// 3. Check if groupId 'com.github.everit-org.json-schema' exists and groupId 'org.everit.json' doesn't
+		assertEquals(1, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("com.github.everit-org.json-schema"))
+				.count());		
+		assertEquals(0, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("org.everit.json"))
+				.count());
+		
+		
+		// 5. Check that the mockito dependency is not present in the module 'apicurio-registry-app'
+		assertEquals(0, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry-app"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("org.mockito") && d.getArtifactId().equals("mockito-core") && d.getVersion().equals("3.11.2"))
+				.count());
+		
+		
+		// 6. Check that the jackson-databind dependency is not present in the <dependencyManagement> of root pom
+		assertEquals(0, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("com.fasterxml.jackson.core") && d.getArtifactId().equals("jackson-databind"))
+				.count());
+		
+		
+		// Configuring and running PME
+		Properties prop = new Properties();
+		prop.setProperty("groovyScripts", groovy.toString());
+		prop.setProperty("maven.repo.local", mvnRepo.toString());
+		SMContainer smc = TestUtils.createSessionAndManager(prop);
+		smc.getRequest().setPom(rootPom);
+		smc.getManager().scanAndApply(smc.getSession());
+
+		// After Manipulations
+		projects = new PomIO().parseProject(rootPom);
+
+		// 1. asserting that the version is inlined for 'quarkus-test-common'
+		assertTrue(systemOutRule.getLog().contains("Custom Adjustments : Inlining version for io.quarkus:quarkus-test-common"));
+		assertEquals("1.12.2.Final", projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("io.quarkus") && d.getArtifactId().equals("quarkus-test-common"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getVersion());
+		
+		
+		
+		// 2. Asserting that the value of property 'quarkus.version' is overridden 
+		assertTrue(systemOutRule.getLog().contains("Custom Adjustments : Overriding value of the property 'quarkus.version'"));
+		assertEquals("1.11.7.Final-redhat-00009", projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst().orElseThrow(Exception::new)
+				.getModel()
+				.getProperties()
+				.getProperty("quarkus.version"));
+		
+		
+		
+		// 3. Assert that the groupId 'com.github.everit-org.json-schema' is overridden
+		assertTrue(systemOutRule.getLog().contains("Custom Adjustments : Overriding groupId: 'com.github.everit-org.json-schema' ---> org.everit.json"));
+		assertEquals(0, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("com.github.everit-org.json-schema"))
+				.count());		
+		assertEquals(1, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("org.everit.json"))
+				.count());
+		
+		
+		
+		// 4. Assert that deployment is enabled for the module 'apicurio-registry-storage-kafkasql'
+		assertTrue(systemOutRule.getLog().contains("Deployment Enabled for module io.apicurio:apicurio-registry-storage-kafkasql"));
+		
+		
+		
+		// 5. Assert that the mockito dependency is added to the module 'apicurio-registry-app'
+		assertEquals(1, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry-app"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("org.mockito") && d.getArtifactId().equals("mockito-core") && d.getVersion().equals("3.11.2"))
+				.count());
+		
+		
+		
+		// 6. Assert that the jackson-databind dependency is added in the <dependencyManagement> of root pom
+		assertEquals(1, projects.stream()
+				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
+				.findFirst()
+				.orElseThrow(Exception::new)
+				.getModel()
+				.getDependencyManagement().getDependencies().stream()
+				.filter(d -> d.getGroupId().equals("com.fasterxml.jackson.core") && d.getArtifactId().equals("jackson-databind"))
+				.count());
+	}
+	
 }
