@@ -5,9 +5,9 @@ name: CI
 
 on:
   push:
-    branches: master
+    branches: main
   pull_request:
-    branches: master
+    branches: main
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       run: mvn -B -V install
 
   snapshot:
-    if: github.repository == 'project-ncl/manipulator-groovy-examples' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.repository == 'project-ncl/manipulator-groovy-examples' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
