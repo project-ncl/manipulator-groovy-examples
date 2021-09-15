@@ -27,14 +27,7 @@ Prerequisites
 IntelliJ
 --------
 
-To ensure the [GMavenPlus](https://github.com/groovy/GMavenPlus/) plugin correctly works within
-IntelliJ it is advised that the following plugin is installed first:
-
-* https://plugins.jetbrains.com/plugin/7442-gmavenplus-intellij-plugin
-
-It is also recommended to install:
-
-* https://plugins.jetbrains.com/plugin/6317-lombok/
+With current versions of IntelliJ both Lombok and Groovy handling are built in so no plugins are required.
 
 Usage
 =====

@@ -32,7 +32,7 @@ catch (ManipulationUncheckedException e )
 }
 
 File information = new File(gmeScript.getBaseDir(), "build.gradle")
-def newContent = information.text.replace('2.0.12.Final', "2.0.15.Final")
+String newContent = information.text.replace('2.0.12.Final', "2.0.15.Final")
 information.text = newContent
 
 println "New content is " + newContent

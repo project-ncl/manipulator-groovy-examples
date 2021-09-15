@@ -67,8 +67,7 @@ public class MavenScriptTest
         prop.setProperty( "versionSuffix", "release-1" );
         prop.setProperty( "groovyScripts", groovy.toString() );
         prop.setProperty( "maven.repo.local", mvnRepo.toString() );
-        SMContainer smc = TestUtils.createSessionAndManager( prop );
-        smc.getRequest().setPom( rootPom );
+        SMContainer smc = TestUtils.createSessionAndManager( prop, rootPom );
         smc.getManager().scanAndApply( smc.getSession() );
 
         assertTrue( systemOutRule.getLog().contains( "BASESCRIPT" ) );
@@ -96,8 +95,7 @@ public class MavenScriptTest
         Properties prop = new Properties();
         prop.setProperty( "groovyScripts", preGroovy.toString() );
         prop.setProperty( "maven.repo.local", mvnRepo.toString() );
-        SMContainer smc = TestUtils.createSessionAndManager( prop );
-        smc.getRequest().setPom( rootPom );
+        SMContainer smc = TestUtils.createSessionAndManager( prop, rootPom );
         smc.getManager().scanAndApply( smc.getSession() );
 
         List<Project> result = new PomIO().parseProject( rootPom );
@@ -115,7 +113,7 @@ public class MavenScriptTest
                 .getParentFile(), "pom.xml");
         PomIO pomIO = new PomIO();
         List<Project> projects = pomIO.parseProject(pRoot);
-        ManipulationManager m = new ManipulationManager(Collections.emptyMap(), Collections.emptyMap(), null);
+        ManipulationManager m = new ManipulationManager(Collections.emptyMap(), Collections.emptyMap(), null, null);
         ManipulationSession ms = TestUtils.createSession(null);
         m.init(ms);
 
@@ -164,7 +162,7 @@ public class MavenScriptTest
 
         PomIO pomIO = new PomIO();
         List<Project> projects = pomIO.parseProject( pme );
-        ManipulationManager m = new ManipulationManager( Collections.emptyMap(), Collections.emptyMap(), null );
+        ManipulationManager m = new ManipulationManager( Collections.emptyMap(), Collections.emptyMap(), null, null );
         ManipulationSession ms = TestUtils.createSession( null );
         m.init( ms );
 
@@ -243,8 +241,8 @@ public class MavenScriptTest
 				.findFirst()
 				.orElseThrow(Exception::new)
 				.getVersion());
-		
-		
+
+
 		// 2. Fetch the value of property 'quarkus.version'
 		assertEquals("1.12.2.Final", projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
@@ -252,8 +250,8 @@ public class MavenScriptTest
 				.getModel()
 				.getProperties()
 				.getProperty("quarkus.version"));
-		
-		
+
+
 		// 3. Check if groupId 'com.github.everit-org.json-schema' exists and groupId 'org.everit.json' doesn't
 		assertEquals(1, projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
@@ -262,7 +260,7 @@ public class MavenScriptTest
 				.getModel()
 				.getDependencyManagement().getDependencies().stream()
 				.filter(d -> d.getGroupId().equals("com.github.everit-org.json-schema"))
-				.count());		
+				.count());
 		assertEquals(0, projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
 				.findFirst()
@@ -271,8 +269,8 @@ public class MavenScriptTest
 				.getDependencyManagement().getDependencies().stream()
 				.filter(d -> d.getGroupId().equals("org.everit.json"))
 				.count());
-		
-		
+
+
 		// 5. Check that the mockito dependency is not present in the module 'apicurio-registry-app'
 		assertEquals(0, projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry-app"))
@@ -282,8 +280,8 @@ public class MavenScriptTest
 				.getDependencies().stream()
 				.filter(d -> d.getGroupId().equals("org.mockito") && d.getArtifactId().equals("mockito-core") && d.getVersion().equals("3.11.2"))
 				.count());
-		
-		
+
+
 		// 6. Check that the jackson-databind dependency is not present in the <dependencyManagement> of root pom
 		assertEquals(0, projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
@@ -293,14 +291,13 @@ public class MavenScriptTest
 				.getDependencyManagement().getDependencies().stream()
 				.filter(d -> d.getGroupId().equals("com.fasterxml.jackson.core") && d.getArtifactId().equals("jackson-databind"))
 				.count());
-		
-		
+
+
 		// Configuring and running PME
 		Properties prop = new Properties();
 		prop.setProperty("groovyScripts", groovy.toString());
 		prop.setProperty("maven.repo.local", mvnRepo.toString());
-		SMContainer smc = TestUtils.createSessionAndManager(prop);
-		smc.getRequest().setPom(rootPom);
+		SMContainer smc = TestUtils.createSessionAndManager(prop, rootPom);
 		smc.getManager().scanAndApply(smc.getSession());
 
 		// After Manipulations
@@ -318,10 +315,10 @@ public class MavenScriptTest
 				.findFirst()
 				.orElseThrow(Exception::new)
 				.getVersion());
-		
-		
-		
-		// 2. Asserting that the value of property 'quarkus.version' is overridden 
+
+
+
+		// 2. Asserting that the value of property 'quarkus.version' is overridden
 		assertTrue(systemOutRule.getLog().contains("Custom Adjustments : Overriding value of the property 'quarkus.version'"));
 		assertEquals("1.11.7.Final-redhat-00009", projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
@@ -329,9 +326,9 @@ public class MavenScriptTest
 				.getModel()
 				.getProperties()
 				.getProperty("quarkus.version"));
-		
-		
-		
+
+
+
 		// 3. Assert that the groupId 'com.github.everit-org.json-schema' is overridden
 		assertTrue(systemOutRule.getLog().contains("Custom Adjustments : Overriding groupId: 'com.github.everit-org.json-schema' ---> org.everit.json"));
 		assertEquals(0, projects.stream()
@@ -341,7 +338,7 @@ public class MavenScriptTest
 				.getModel()
 				.getDependencyManagement().getDependencies().stream()
 				.filter(d -> d.getGroupId().equals("com.github.everit-org.json-schema"))
-				.count());		
+				.count());
 		assertEquals(1, projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
 				.findFirst()
@@ -350,14 +347,14 @@ public class MavenScriptTest
 				.getDependencyManagement().getDependencies().stream()
 				.filter(d -> d.getGroupId().equals("org.everit.json"))
 				.count());
-		
-		
-		
+
+
+
 		// 4. Assert that deployment is enabled for the module 'apicurio-registry-storage-kafkasql'
 		assertTrue(systemOutRule.getLog().contains("Deployment Enabled for module io.apicurio:apicurio-registry-storage-kafkasql"));
-		
-		
-		
+
+
+
 		// 5. Assert that the mockito dependency is added to the module 'apicurio-registry-app'
 		assertEquals(1, projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry-app"))
@@ -367,9 +364,9 @@ public class MavenScriptTest
 				.getDependencies().stream()
 				.filter(d -> d.getGroupId().equals("org.mockito") && d.getArtifactId().equals("mockito-core") && d.getVersion().equals("3.11.2"))
 				.count());
-		
-		
-		
+
+
+
 		// 6. Assert that the jackson-databind dependency is added in the <dependencyManagement> of root pom
 		assertEquals(1, projects.stream()
 				.filter(p -> p.getArtifactId().equals("apicurio-registry"))
@@ -380,5 +377,5 @@ public class MavenScriptTest
 				.filter(d -> d.getGroupId().equals("com.fasterxml.jackson.core") && d.getArtifactId().equals("jackson-databind"))
 				.count());
 	}
-	
+
 }

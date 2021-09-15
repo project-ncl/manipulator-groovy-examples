@@ -3,6 +3,7 @@ package org.goots.groovy;
 import com.google.common.io.Resources;
 import org.apache.commons.io.FileUtils;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.ext.io.rest.DefaultTranslator;
 import org.gradle.api.Project;
 import org.jboss.gm.analyzer.alignment.AbstractWiremockTest;
 import org.jboss.gm.analyzer.alignment.AlignmentTask;
@@ -44,26 +45,8 @@ import static org.junit.Assert.assertFalse;
 public class GradleScriptTest
                 extends AbstractWiremockTest
 {
-
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
-
-    static
-    {
-        // TODO: Remove once GME 2.3 is out.
-        //        try
-        //        {
-        //            LogPrintStream logPrintStream =
-        //                            (LogPrintStream) FieldUtils.readDeclaredField( systemErrRule, "logPrintStream", true);
-        //            Object m = FieldUtils.readDeclaredField( logPrintStream, "muteableLogStream", true );
-        //            FieldUtils.writeDeclaredField( m, "originalStreamMuted", false, true );
-        //            FieldUtils.writeDeclaredField( m, "failureLogMuted", true, true );
-        //        }
-        //        catch ( IllegalAccessException e )
-        //        {
-        //            e.printStackTrace();
-        //        }
-    }
 
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
@@ -93,11 +76,16 @@ public class GradleScriptTest
             FileUtils.copyURLToFile( localInitScriptUrl, initScript );
         }
 
-        stubFor( post( urlEqualTo( "/da/rest/v-1/reports/lookup/gavs" ) ).willReturn( aResponse().withStatus( 200 )
-                                                                                                 .withHeader( "Content-Type",
-                                                                                                              "application/json;charset=utf-8" )
-                                                                                                 .withBody( readSampleDAResponse(
-                                                                                                                 "simple-project-with-custom-groovy-script-da-response.json" ) ) ) );
+        stubFor(post(urlEqualTo("/da/rest/v-1/" + DefaultTranslator.Endpoint.LOOKUP_GAVS))
+                                .willReturn(aResponse()
+                                                            .withStatus(200)
+                                                            .withHeader("Content-Type", "application/json;charset=utf-8")
+                                                            .withBody(readSampleDAResponse("simple-project-with-custom-groovy-script-da-response.json"))));
+        stubFor(post(urlEqualTo("/da/rest/v-1/" + DefaultTranslator.Endpoint.LOOKUP_LATEST))
+                                .willReturn(aResponse()
+                                                            .withStatus(200)
+                                                            .withHeader("Content-Type", "application/json;charset=utf-8")
+                                                            .withBody(readSampleDAResponse("simple-project-with-custom-groovy-script-da-response-project.json"))));
     }
 
     private void runAlignment( ArrayList<String> args ) throws Exception
@@ -208,7 +196,7 @@ public class GradleScriptTest
 
         runAlignment( args );
 
-        assertTrue( systemOutRule.getLog().contains( "PASS : Caught Model is not supported for Groovy in initial stage." ) );
+        assertTrue( systemOutRule.getLog().contains( "PASS : Caught Getting the model is not supported for Groovy in stage FIRST" ) );
         assertTrue( systemOutRule.getLog().contains( "Running Groovy script on" ) );
 
         GMEManipulationModel alignmentModel = new GMEManipulationModel( ManipulationIO.readManipulationModel( projectRoot ) );
