@@ -1,26 +1,19 @@
 import groovy.util.logging.Slf4j
 import org.apache.maven.model.Build
 import org.apache.maven.model.Dependency
-import org.apache.maven.model.DependencyManagement
 import org.apache.maven.model.Plugin
 import org.codehaus.plexus.util.xml.Xpp3Dom
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef
-import org.commonjava.maven.ext.common.ManipulationException
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef
 import org.commonjava.maven.ext.common.model.Project
 import org.commonjava.maven.ext.core.groovy.BaseScript
 import org.commonjava.maven.ext.core.groovy.InvocationPoint
 import org.commonjava.maven.ext.core.groovy.InvocationStage
 import org.commonjava.maven.ext.core.groovy.PMEBaseScript
-import org.commonjava.maven.ext.core.ManipulationSession
-import org.commonjava.maven.ext.core.state.RESTState
-import org.commonjava.maven.ext.io.rest.Translator
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef
-
 
 @InvocationPoint(invocationPoint = InvocationStage.FIRST)
 @PMEBaseScript BaseScript pme
 @Slf4j
-public class MangleVersion {
+class MangleVersion {
 
     BaseScript pme;
 
@@ -39,37 +32,37 @@ public class MangleVersion {
         }
         log.info "---------------------------------------- Inlining Complete ---------------------------------------------"
         log.info ""
-		
+
 		// Manipulation 2
 		// Sometimes we might want to override a property
-        // This methods helps in overriding the value of a specific property 
+        // This methods helps in overriding the value of a specific property
         overrideProperty("quarkus.version", "1.11.7.Final-redhat-00009")
 
         pme.projects.each {
             project ->
                 def deps = [project.model?.dependencies, project.model?.dependencyManagement?.dependencies].flatten() //aggregate the 2 sets in a single list
                 deps.removeAll { it == null } // remove nulls
-                
+
                 log.info " # Scanning Module =>  $project.groupId:$project.artifactId"
-				
+
 				// Manipulation 3
 	            // artifact 'org.everit.json.schema' is available from group 'org.everit.json' in Indy
 	            // Hence, in situations like this we need to override the groupId for a specific artifact
-                overrideGroupId(deps, "com.github.everit-org.json-schema", "org.everit.json")                
-				
+                overrideGroupId(deps, "com.github.everit-org.json-schema", "org.everit.json")
+
 				// Manipulation 4
 				// sometime deployment for a specific module is disabled for a specific module in upstream
 				// But we might want to deploy that module in downstream
 				// This method will check if the deploy plugin is configured to skip deploy. If yes, it will configure the plugin to deploy the module.
                 enableDeployForSpecificModule(project, "io.apicurio", "apicurio-registry-storage-kafkasql")
-				
+
 				// Manipulation 5
 				// Sometimes we might want to use a specific version of a dependency in a particular module to avoid build/compilation failure
-                // This method adds the specified dependency in the module specified        
+                // This method adds the specified dependency in the module specified
                 if (project.groupId == "io.apicurio" && project.artifactId == "apicurio-registry-app") {
                     addDependency(project, "org.mockito", "mockito-core", "3.11.2", "test")
                 }
-				
+
 				// Manipulation 6
 				// Sometime we might want to make a specific version of a dependency available to all the modules
                 // This method adds a new dependency in the <dependencyManagement> of root pom
@@ -86,32 +79,32 @@ public class MangleVersion {
         log.info "--------------------------------------------------------------------------------------------------------"
         String existingValue = pme.project.model.properties.get(propertyName)
         pme.getProject().getModel().getProperties().setProperty(propertyName, newValue) // overriding the property value
-        String overriddenValue = pme.project.model.properties.get(propertyName)       
+        String overriddenValue = pme.project.model.properties.get(propertyName)
         log.info "Old Value: $existingValue"
         log.info "New Value: $overriddenValue"
-        log.info "-------------------------------------- Property Value Overriden -----------------------------------------"        
+        log.info "-------------------------------------- Property Value Overriden -----------------------------------------"
         log.info ""
     }
 
     def overrideGroupId(deps, String oldGroup, String newGroup) {
         deps.each {
-            dep ->  
+            dep ->
                 log.debug "$dep"
-                if (dep.groupId == oldGroup) {                     
+                if (dep.groupId == oldGroup) {
                      log.info "--------------------------------------------------------------------------------------------------------"
                      log.info "Custom Adjustments : Overriding groupId: '$oldGroup' ---> $newGroup"
                      log.info "--------------------------------------------------------------------------------------------------------"
-                     log.info "Old Coordinates: $dep"                            
+                     log.info "Old Coordinates: $dep"
                      dep.groupId = newGroup
                      log.info "New Coordinates: $dep"
-                     log.info "------------------------------------------ GroupId Overriden -------------------------------------------"                     
-        	     log.info ""   
+                     log.info "------------------------------------------ GroupId Overriden -------------------------------------------"
+        	     log.info ""
                 }
         }
-         
+
     }
 
-    def addDependency(project, String groupId, String artifactId, String version, String scope) {        
+    def addDependency(project, String groupId, String artifactId, String version, String scope) {
         log.info "--------------------------------------------------------------------------------------------------------"
         log.info "Custom Adjustments : Adding a new Dependency"
         log.info "--------------------------------------------------------------------------------------------------------"
@@ -121,8 +114,8 @@ public class MangleVersion {
         dep.version = version
         dep.scope = scope
         project.model.dependencies.add(dep)
-        log.info "$groupId:$artifactId:$version:$scope ---> in project '$project'"        
-        log.info "------------------------------------------ Dependency Added --------------------------------------------"        
+        log.info "$groupId:$artifactId:$version:$scope ---> in project '$project'"
+        log.info "------------------------------------------ Dependency Added --------------------------------------------"
         log.info ""
     }
 
@@ -136,14 +129,14 @@ public class MangleVersion {
         dep.version = version
         dep.scope = scope
         project.model.dependencyManagement.dependencies.add(dep)
-        log.info "$groupId:$artifactId:$version:$scope ---> in project '$project'"        
-        log.info "------------------------------------------ Dependency Added --------------------------------------------"        
+        log.info "$groupId:$artifactId:$version:$scope ---> in project '$project'"
+        log.info "------------------------------------------ Dependency Added --------------------------------------------"
         log.info ""
-        
+
     }
 
     def enableDeployForSpecificModule (project, String groupId, String artifactId) {
-        
+
         if (project.groupId == groupId && project.artifactId == artifactId) {
             log.info "--------------------------------------------------------------------------------------------------------"
             log.info "Custom Adjustments : Enabling Deploy for module $groupId:$artifactId"

@@ -56,8 +56,8 @@
     <groovyVersion>3.0.7</groovyVersion>
     <atlasVersion>0.17.1</atlasVersion>
 
-    <pmeVersion>4.3</pmeVersion>
-    <gmeVersion>2.7</gmeVersion>
+    <pmeVersion>4.9</pmeVersion>
+    <gmeVersion>3.7</gmeVersion>
   </properties>
 
   <dependencyManagement>
@@ -73,6 +73,12 @@
         <artifactId>pom-manipulation-core</artifactId>
         <version>${pmeVersion}</version>
         <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.maven.ext</groupId>
+        <artifactId>pom-manipulation-io</artifactId>
+        <version>${pmeVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
