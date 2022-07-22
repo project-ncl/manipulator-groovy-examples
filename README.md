@@ -1,5 +1,5 @@
 
-[![Build Status (Travis CI)](https://travis-ci.org/project-ncl/manipulator-groovy-examples.svg?branch=main)](https://travis-ci.org/project-ncl/manipulator-groovy-examples.svg?branch=main)
+![Build status (GitHub Actions)](https://github.com/project-ncl/manipulator-groovy-examples/workflows/CI/badge.svg)
 
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
